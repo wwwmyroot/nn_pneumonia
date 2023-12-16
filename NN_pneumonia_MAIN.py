@@ -1,15 +1,64 @@
 # -*- coding: utf-8 -*-
-"""NN_PNEUMONIA"
-Original file is located at
-    https://github.com/wwwmyroot/nn_pneumonia/NN_pneumonia_MAIN.py
-"""
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     formats: ipynb,py
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.15.2
+# ---
 
-#@title ---- INIT_STEP ---- Подключение библиотек.
+# NN_PNEUMONIA | Original file is located at
+# https://github.com/wwwmyroot/nn_pneumonia/NN_pneumonia_MAIN.py
+#
+# LATER: Добавить выгрузку весов.
+
+#@title ---- TRY: решение дисконнекта GoogleCollab
+# ---- Не понадобилось, но сохраню на всякий случай ----
+# -- v0
+# from IPython.display import Audio
+#   # import numpy as np
+#
+# Audio(np.array([0] * 2 * 3600 * 3000, dtype=np.int8), normalize=False, rate=3000, autoplay=True)
+#   # Audio([None] * 2 * 3600 * 3000, normalize=False, rate=3000, autoplay=True)
+#
+# -- v1: F-12 and input in dev-tools console
+#
+# function ClickConnect(){
+#  console.log("Working");
+#  document.querySelector("colab-toolbar-button#connect").click()
+#}
+#setInterval(ClickConnect, 60000)
+#
+# -- v2: python solution
+# import numpy as np
+# import time
+# import mouse
+# while True:
+    # random_row = np.random.random_sample()*100
+    # random_col = np.random.random_sample()*10
+    # random_time = np.random.random_sample()*np.random.random_sample() * 100
+    # mouse.wheel(1000)
+    # mouse.wheel(-1000)
+    # mouse.move(random_row, random_col, absolute=False, duration=0.2)
+    # mouse.move(-random_row, -random_col, absolute=False, duration = 0.2)
+    # mouse.LEFT
+    # time.sleep(random_time)
+#
+
+#@title <h1><b>---- INIT_STEP ---- Подключение библиотек.</h1></b>
+# ---- INIT_STEP ---- Подключение библиотек.
 # -- Библиотека TensorFlow
 import tensorflow as tf
 #
 # -- Библиотека Numpy
 import numpy as np
+#
+# -- Библиотека keras
+import keras
 #
 # -- Подключение нужных слоев из модуля tensorflow.keras.layers
 from tensorflow.keras.models import Sequential
@@ -27,7 +76,8 @@ from PIL import Image
 #
 # -- Для разделения на обучающую и проверочную/тестовую выборку
 from sklearn.model_selection import train_test_split
-from keras.utils.vis_utils import plot_model
+# from keras.utils.vis_utils import plot_model
+from keras.utils import plot_model
 #
 # -- Для отрисовки графиков
 import matplotlib.pyplot as plt
@@ -48,7 +98,9 @@ import gdown
 import gc
 #
 #
-# ---- PREPARE_STEP ---- Загрузка, распаковка, подготовка датасета.
+
+#@title <h1><b>---- WORKER_2 ---- </h1></b>
+# ---- WORKER_2 ----
 #
 class Worker2:
   def __init__(self):
@@ -136,14 +188,14 @@ class Worker2:
     IMG_HEIGHT = size[1]
     # Пустой список для данных изображений
     data_images = []
-
+#
     for file_name in self.data_files:
         # Открытие и смена размера изображения
         img = Image.open(file_name).resize((IMG_WIDTH, IMG_HEIGHT))
         # Конвертация изображений в режиме CMYK в режим RGB
         if img.mode == 'CMYK':
           img = img.convert('RGB')
-
+#
         # Перевод в numpy-массив
         img_np = np.array(img)
         # Добавление изображения в виде numpy-массива к общему списку
@@ -154,7 +206,7 @@ class Worker2:
     x_data = np.array(data_images)
     # Перевод общего списка меток класса в numpy-массив
     y_data = np.array(self.data_labels)
-
+#
     # Нормированние массива изображений
     x_data = x_data / 255.
                                                     # набор параметров
@@ -446,7 +498,6 @@ class Worker2:
     # Задаем выходной слой на нужное нам количество классов
     prediction_layer = tf.keras.layers.Dense(len(data[0]))
 #
-#
     # Создаем базовую модель NASNetMobile:
     base_model = tf.keras.applications.nasnet.NASNetMobile(input_shape=image_shape,
                             # Не включаем верхнюю часть модели, чтобы можно было использовать свои входные размерности
@@ -500,7 +551,8 @@ class Worker2:
     return model
 #
   def createAndTrainResNet(self):
-    image_size = (224, 224)     # Определяем размер изображений
+    # Определяем размер изображений
+    image_size = (224, 224)
     data = self.getdataforpretrainmodel(image_size)
 #
 #
@@ -848,7 +900,7 @@ class Worker2:
    print(f'Максимальная точность на обучающей выборке: {round(max(hXception.history["accuracy"]),3)}')
    print(f'Максимальная точность на проверочной выборке: {round(max(hXception.history["val_accuracy"]),3)}')
    return model
-
+#
   def createAndTrainEfficientNet(self):
     # Определяем размер изображений
     image_size = (299, 299)
@@ -987,6 +1039,9 @@ class Worker2:
     return model
 #
 worker_pretrain=Worker2()
+#
+
+#@title <h1><b>---- WORKER ----</h1></b>
 #
 class Worker:
   def __init__(self):
@@ -1298,6 +1353,8 @@ class Worker:
     print(f'Максимальная точность на проверочной выборке: {round(np.array(history_val_accuracy).max(), 3)}')
 worker=Worker()
 #
+
+#@title <h1><b>---- RUN WORKERS --- <h1><b>
 # Загрузка датасета
 worker.load_dataset()
 #
@@ -1307,10 +1364,10 @@ worker.show_samples()
 # Информация о датасете
 worker.dataset_info()
 #
-"""<h1><b> Эксперименты (свои модели)</b></h1>
 
-### Эксп. №1 (97.4%, 97.4%)
-"""
+# @title <h1><b>---- Эксперименты (свои модели) ----</h1><b>
+
+#@title ### Эксп. №1 (97.4%, 97.4%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1351,13 +1408,14 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model, False)
 #
-"""**Несколько запусков**"""
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №2 (убран макс-пуллинг) (96.6% 96.6%)"""
+
+#@title ### Эксп. №2 (убран макс-пуллинг) (96.6% 96.6%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1398,13 +1456,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №3 (добавлен полносвязный слой в конце) (97.5% 97.6%)"""
+
+#@title ### Эксп. №3 (добавлен полносвязный слой в конце) (97.5% 97.6%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1446,13 +1506,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №4 (усилен полносвязный слой в конце) (97.5% 97.6%)"""
+
+#@title ### Эксп. №4 (усилен полносвязный слой в конце) (97.5% 97.6%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1495,13 +1557,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №5 (ослабили полносвязный в конце) (97.5% 97.7%)"""
+
+#@title ### Эксп. №5 (ослаблен полносвязный в конце) (97.5% 97.7%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1543,13 +1607,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №6 (ослабили первый сверточный) (97.4% 97.7%)"""
+
+#@title ### Эксп. №6 (ослаблен первый сверточный) (97.4% 97.7%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1591,13 +1657,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №7 (усилили первый сверточный) (97.4% 97.7%)"""
+
+#@title ### Эксп. №7 (усилен первый сверточный) (97.4% 97.7%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1639,13 +1707,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №8 (усилили второй сверточный) (97.8% 98.1%)"""
+
+#@title ### Эксп. №8 (усилен второй сверточный) (97.8% 98.1%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1687,13 +1757,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №9 (добавление третьего сверточного блока) (98.1% 98.4%)"""
+
+#@title ### Эксп. №9 (добавлен третий сверточный) (98.1% 98.4%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1738,13 +1810,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №10 (добавление четвертого сверточного блока) (98.3% 98.6%)"""
+
+#@title ### Эксп. №10 (добавлен четвертый сверточный) (98.3% 98.6%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1793,13 +1867,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №11 (добавление BatchNorm + Dropout) (98.7% 98.9%)"""
+
+#@title ### Эксп. №11 (добавлен BatchNorm + Dropout) (98.7% 98.9%)
 #
 # Создание выборок
 IMG_HEIGHT = 64
@@ -1848,13 +1924,14 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №12 (Переход на 128х128) (98.9% 98.9%)"""
+
+#@title ### Эксп. №12 (Переход на 128х128) (98.9% 98.9%)
 #
 # Создание выборок
 IMG_HEIGHT = 128
@@ -1903,13 +1980,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №13 (Смена ядра сверточного слоя) (98.9% 98.9%)"""
+
+#@title ### Эксп. №13 (Смена ядра сверточного слоя) (98.9% 98.9%)
 #
 # Создание выборок
 IMG_HEIGHT = 128
@@ -1964,13 +2043,15 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""### Эксп. №14 (Смена ядра 2 и последующих сверточных слоев) (98.8% 99.1%)"""
+
+#@title ### Эксп. №14 (Смена ядра 2 и последующих сверточных слоев) (98.8% 99.1%)
 #
 # Создание выборок
 IMG_HEIGHT = 128
@@ -2025,53 +2106,61 @@ store_learning = model.fit(x_train,
 #
 worker.show_learning_information(store_learning, model)
 #
-"""**Несколько запусков**"""
+
+#@title Несколько запусков
 #
 worker.train_model(
     funcModel=create_model,
     count=5)
 #
-"""#<h1><b> Эксперименты (предобученные модели)</b></h1>"""
+
+#@title <h1><b> Эксперименты (предобученные модели)</b></h1>
 #
 # Загрузка датасета
 worker_pretrain.load_dataset()
 #
-"""### Эксп. №1 NASNetMobile (99.3%)"""
+
+#@title ### Эксп. №1 NASNetMobile (99.3%)
 #
 model = worker_pretrain.createAndTrainNASNetMobile()
 #
 # Схема сети
 plot_model(model.layers[4])
 #
-"""### Эксп. №2 ResNet50 (99.04%)"""
+
+#@title ### Эксп. №2 ResNet50 (99.04%)
 #
 model = worker_pretrain.createAndTrainResNet()
 #
 # Схема сети
 plot_model(model.layers[4])
 #
-"""### Эксп. №3 ResNet50v2 (99.1%)"""
+
+#@title ### Эксп. №3 ResNet50v2 (99.1%)
 #
 model = worker_pretrain.createAndTrainResNet50V2()
 #
 # Схема сети
 plot_model(model.layers[4])
 #
-"""### Эксп. №4 VGG16 (98.9%)"""
+
+#@title ### Эксп. №4 VGG16 (98.9%)
 #
 model = worker_pretrain.createAndTrainVGG16()
 #
 # Схема сети
 plot_model(model.layers[4])
 #
-"""### Эксп. №5 VGG19  (98.8%)"""
+
+#@title ### Эксп. №5 VGG19  (98.8%)
 #
 model = worker_pretrain.createAndTrainVGG19()
 #
 # Схема сети
 plot_model(model.layers[4])
 #
-"""### Эксп. №6 XCeption (99.4%)"""
+
+#@title ### Эксп. №6 XCeption (99.4%)
 #
 model = worker_pretrain.createAndTrainXception()
 #
