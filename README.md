@@ -8,7 +8,7 @@ NN for pneumonia detection
 * Основной код (.py) - [NN_pneumonia_MAIN.py](https://github.com/wwwmyroot/nn_pneumonia/blob/main/NN_pneumonia_MAIN.py)
 * Ноутбук (.ipynb) - [NN_pneumonia_MAIN.ipynb](https://github.com/wwwmyroot/nn_pneumonia/blob/main/NN_pneumonia_MAIN.ipynb)
 * Ноутбук с output cells  (GoogleCollab) - [NN_pneumonia_MAIN_with_output.ipynb](https://github.com/wwwmyroot/nn_pneumonia/blob/main/NN_pneumonia_MAIN_with_output.ipynb)
-* Скрины - в папке [/img]()
+* Скрины - в папке [/img](https://github.com/wwwmyroot/nn_pneumonia/tree/main/img)
 
 -----
 
